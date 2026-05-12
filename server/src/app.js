@@ -6,11 +6,16 @@ require("dotenv").config();
 
 const app = express();
 
+// ======================
 // MIDDLEWARES
+// ======================
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// STATIC UPLOADS FOLDER
+// ======================
+// STATIC UPLOADS
+// ======================
 app.use(
   "/uploads",
   express.static(
@@ -18,7 +23,9 @@ app.use(
   )
 );
 
-// ROUTES
+// ======================
+// ROUTES IMPORT
+// ======================
 const testRoutes = require("./routes/testRoutes");
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
@@ -29,7 +36,9 @@ const uploadRoutes = require("./routes/uploadRoutes");
 const checklistRoutes = require("./routes/checklistRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 
+// ======================
 // API ROUTES
+// ======================
 app.use("/api", testRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
@@ -40,19 +49,25 @@ app.use("/api/upload", uploadRoutes);
 app.use("/api/checklists", checklistRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 
+// ======================
 // PUBLIC FOLDER
+// ======================
 app.use(
   express.static(
     path.join(__dirname, "public")
   )
 );
 
-// TEST ROUTE
+// ======================
+// ROOT ROUTE
+// ======================
 app.get("/", (req, res) => {
-  res.send("API Running...");
+  res.status(200).send("API Running...");
 });
 
+// ======================
 // CLIENT UPLOAD PAGE
+// ======================
 app.get("/upload/:token", (req, res) => {
 
   res.sendFile(
@@ -65,7 +80,33 @@ app.get("/upload/:token", (req, res) => {
 
 });
 
+// ======================
+// 404 HANDLER
+// ======================
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: "Route not found",
+  });
+});
+
+// ======================
+// GLOBAL ERROR HANDLER
+// ======================
+app.use((err, req, res, next) => {
+
+  console.error(err);
+
+  res.status(500).json({
+    success: false,
+    message: "Internal Server Error",
+  });
+
+});
+
+// ======================
 // SERVER START
+// ======================
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
