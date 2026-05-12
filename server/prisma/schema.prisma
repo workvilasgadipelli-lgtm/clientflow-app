@@ -1,0 +1,113 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  role      String   @default("admin")
+  createdAt DateTime @default(now())
+}
+
+model Client {
+  id     Int       @id @default(autoincrement())
+  name   String
+  email  String    @unique
+  mobile String?
+  pan    String?
+  dob    DateTime?
+  status String    @default("active")
+
+  emailEnabled    Boolean @default(true)
+  whatsappEnabled Boolean @default(false)
+
+  createdAt DateTime @default(now())
+
+  emailLogs EmailLog[]
+  uploadRequests    UploadRequest[]
+uploadedDocuments UploadedDocument[]
+}
+
+model EmailTemplate {
+  id       Int     @id @default(autoincrement())
+  name     String
+  subject  String
+  html     String  @db.LongText
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+
+  emailLogs EmailLog[]
+}
+
+model EmailLog {
+  id Int @id @default(autoincrement())
+
+  clientId Int
+  client   Client @relation(fields: [clientId], references: [id])
+
+  templateId Int
+  template   EmailTemplate @relation(fields: [templateId], references: [id])
+
+  status String
+  sentAt DateTime @default(now())
+}
+
+model UploadRequest {
+  id          Int      @id @default(autoincrement())
+
+  clientId    Int
+  client      Client   @relation(fields: [clientId], references: [id])
+
+  token       String   @unique
+  expiresAt   DateTime
+
+  createdAt   DateTime @default(now())
+
+  documents UploadRequestDocument[]
+}
+
+model UploadedDocument {
+  id           Int      @id @default(autoincrement())
+
+  clientId     Int
+  client       Client   @relation(fields: [clientId], references: [id])
+
+  fileName     String
+  filePath     String
+
+  uploadedAt   DateTime @default(now())
+}
+
+
+model DocumentChecklist {
+  id          Int      @id @default(autoincrement())
+
+  name        String
+
+  createdAt   DateTime @default(now())
+
+  uploadDocuments UploadRequestDocument[]
+}
+
+
+model UploadRequestDocument {
+  id               Int      @id @default(autoincrement())
+
+  uploadRequestId  Int
+  uploadRequest    UploadRequest @relation(fields: [uploadRequestId], references: [id])
+
+  checklistId      Int
+  checklist        DocumentChecklist @relation(fields: [checklistId], references: [id])
+
+  status           String   @default("pending")
+
+  uploadedAt       DateTime?
+}
