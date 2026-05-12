@@ -150,8 +150,7 @@ exports.sendBulkTemplateEmail = async (req, res) => {
         });
 
         // UPLOAD LINK
-        const uploadLink =
-          `http://localhost:5000/upload/${token}`;
+        const uploadLink = `https://clientflow-app-bolb.onrender.com/upload/${token}`;
 
         // TEMPLATE VARIABLES
         let finalHtml = template.html;
