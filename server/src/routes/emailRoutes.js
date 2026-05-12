@@ -1,21 +1,16 @@
 const express = require("express");
+
 const router = express.Router();
 
 const {
-  protect,
-} = require(
-  "../middlewares/authMiddleware"
-);
-
-const {
-
   sendTemplateEmail,
   sendBulkTemplateEmail,
   getEmailHistory,
+} = require("../controllers/emailController");
 
-} = require(
-  "../controllers/emailController"
-);
+const {
+  protect,
+} = require("../middlewares/authMiddleware");
 
 // SEND SINGLE EMAIL
 router.post(
